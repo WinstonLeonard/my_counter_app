@@ -1,71 +1,147 @@
-import { useState } from 'react';
-import { my_counter_app_backend } from 'declarations/my_counter_app_backend';
+import React, { useState, useEffect } from 'react';
+import { Steps, Button, Form, Input, message } from 'antd';
+import CSVUploader from './CSVUploader';
 
-function App() {
+const { Step } = Steps;
 
-  const [counter, setCounter] = useState(0);
-  const [loading, setLoading] = useState(false);
+const App = () => {
+  const [current, setCurrent] = useState(0);
+  const [form] = Form.useForm();
+  const [informationData, setInformationData] = useState({});
+  const [CSVData, setCSVData] = useState();
 
-  console.log(`[App] my_counter_app_backend:`, my_counter_app_backend);
 
-  // Get the current counter value
-  const fetchCount = async () => {
-    try {
-      setLoading(true);
-      const count = await my_counter_app_backend.getCount();
-      console.log(`[fetchCount] Count:`, count);
+  const submitForm = () => {
+    form.submit();
+  }
 
-      setCounter(+count.toString()); // Convert BigInt to number
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };  
-
-  const increment = async () => {
-    if (loading) return; // Cancel if waiting for a new count
-    try {
-      setLoading(true);
-      let result = await my_counter_app_backend.inc(); // Increment the count by 1
-      console.log(`[increment] result:`, result);
-      console.log(`[increment] hash:`, result.hash);
-      await fetchCount(); // Fetch the new count
-    } finally {
-      setLoading(false);
-    }
+  const onFinish = (values) => {
+    console.log('Success:', values);
+    setInformationData(values);
+    setCurrent(current + 1);
   };
 
-  const reset = async () => {
-    if (loading) return; // Cancel if waiting for a new count
-    try {
-      setLoading(true);
-      await my_counter_app_backend.reset(); // Reset counter to 0
-      await fetchCount(); // Fetch the new count
-    } finally {
-      setLoading(false);
+  const onFinishFailed = (errorInfo) => {
+    console.log('Failed:', errorInfo);
+  };
+
+  const steps = [
+    {
+      title: 'Information',
+      content: (
+        <div style={{ display: 'flex', flexDirection: 'column', padding: 30 }}>
+          <Form
+            name="basic"
+            layout="vertical"
+            onFinish={onFinish}
+            onFinishFailed={onFinishFailed}
+            autoComplete="off"
+            labelCol={{ style: { color: '#1890ff', fontWeight: 'bold', fontSize: 16 } }}
+          >
+            <Form.Item
+              label="LLM"
+              name="llm"
+              rules={[{ required: true, message: 'Please fill this out!' }]}
+            >
+              <Input />
+            </Form.Item>
+
+            <Form.Item
+              label="Hyperparameters"
+              name="hyperparameters"
+              rules={[{ required: true, message: 'Please fill this out!' }]}
+            >
+              <Input />
+            </Form.Item>
+
+            <Form.Item
+              label="No of epochs"
+              name="epochs"
+              rules={[{ required: true, message: 'Please fill this out!' }]}
+            >
+              <Input />
+            </Form.Item>
+
+            <Form.Item
+              label="Model evaluation"
+              name="evaluation"
+              rules={[{ required: true, message: 'Please fill this out!' }]}
+            >
+              <Input />
+            </Form.Item>
+
+            <Form.Item>
+              <Button type="primary" htmlType="submit" onClick={submitForm}>
+                Submit
+              </Button>
+            </Form.Item>
+          </Form>
+        </div>
+      ),
+    },
+    {
+      title: 'Upload',
+      content: <CSVUploader setCSVData={setCSVData} />,
+    },
+    {
+      title: 'Summary',
+      content: 'Summary',
+    },
+    {
+      title: 'Recommendation',
+      content: 'Recommendation',
+    },
+    {
+      title: 'Feedback',
+      content: 'Feedback'
     }
-  };  
+  ];
+
+  const next = () => {
+    if (current == 1) {
+      console.log("Submitting CSV file: ", CSVData);
+    }
+    setCurrent(current + 1);
+  };
+
+  const prev = () => {
+    setCurrent(current - 1);
+  };
+
+  useEffect(() => {
+    console.log("information data", informationData);
+    console.log("csv data", CSVData);
+  }, [informationData, CSVData])
 
   return (
-    <main>
-      <br />
-      <br />
-      loll: {counter}
-      <br />
-      <br />
-      <button onClick={increment} style={{ opacity: loading ? 0.5 : 1 }} >Increment</button>
-      <br />
-      <br />
-      <button>Decrement (Add your codee)</button>
-      <br />
-      <br />
-      <button onClick={reset} style={{ opacity: loading ? 0.5 : 1 }} >Reset to zero</button>
-      <br />
-      <br />
-
-    </main>
+    <div style={{padding: 30}}>
+      <Steps current={current}>
+        {steps.map((item) => (
+          <Step key={item.title} title={item.title} />
+        ))}
+      </Steps>
+      <div className="steps-content" style={{ marginTop: 20 }}>
+        {steps[current].content}
+      </div>
+      <div className="steps-action" style={{ marginTop: 20 }}>
+        {(current != 0) && (
+          <Button type="primary" onClick={next}>
+            Next
+          </Button>
+        )}
+        {current === steps.length - 1 && (
+          <Button type="primary" onClick={() => message.success('Processing complete!')}>
+            Done
+          </Button>
+        )}
+        {/* {current > 0 && (
+          <Button style={{ margin: '0 8px' }} onClick={prev}>
+            Previous
+          </Button>
+        )} */}
+      </div>
+    </div>
   );
-}
+};
 
 export default App;

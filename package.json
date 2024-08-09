@@ -14,5 +14,10 @@
   "type": "module",
   "workspaces": [
     "src/my_counter_app_frontend"
-  ]
+  ],
+  "dependencies": {
+    "antd": "^5.20.0",
+    "papaparse": "^5.4.1",
+    "react-router-dom": "^6.26.0"
+  }
 }
