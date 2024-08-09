@@ -49,10 +49,9 @@ function App() {
 
   return (
     <main>
-      <img src="/logo2.svg" alt="DFINITY logo" />
       <br />
       <br />
-      Testtt: {counter}
+      loll: {counter}
       <br />
       <br />
       <button onClick={increment} style={{ opacity: loading ? 0.5 : 1 }} >Increment</button>
