@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Steps, Button, Form, Input, message } from 'antd';
 import CSVUploader from './CSVUploader';
+import Summary from './Summary';
+import Feedback from './Feedback';
 
 const { Step } = Steps;
 
@@ -9,6 +11,7 @@ const App = () => {
   const [form] = Form.useForm();
   const [informationData, setInformationData] = useState({});
   const [CSVData, setCSVData] = useState();
+  const [feedbackData, setFeedbackData] = useState()
 
 
   const submitForm = () => {
@@ -71,7 +74,7 @@ const App = () => {
             </Form.Item>
 
             <Form.Item>
-              <Button type="primary" htmlType="submit" onClick={submitForm}>
+              <Button type="primary" htmlType="submit">
                 Submit
               </Button>
             </Form.Item>
@@ -85,15 +88,11 @@ const App = () => {
     },
     {
       title: 'Summary',
-      content: 'Summary',
-    },
-    {
-      title: 'Recommendation',
-      content: 'Recommendation',
+      content: <Summary/>
     },
     {
       title: 'Feedback',
-      content: 'Feedback'
+      content: <Feedback setFeedbackData={setFeedbackData}/>
     }
   ];
 
@@ -124,14 +123,9 @@ const App = () => {
         {steps[current].content}
       </div>
       <div className="steps-action" style={{ marginTop: 20 }}>
-        {(current != 0) && (
+        {(current != 0 && current != steps.length-1) && (
           <Button type="primary" onClick={next}>
             Next
-          </Button>
-        )}
-        {current === steps.length - 1 && (
-          <Button type="primary" onClick={() => message.success('Processing complete!')}>
-            Done
           </Button>
         )}
         {/* {current > 0 && (
