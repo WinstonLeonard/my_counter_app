@@ -52,6 +52,7 @@ const CSVUploader = ({setCSVData}) => {
         columns={columns}
         rowKey={(record) => record.id || Math.random()} // Add a unique key to each row
         style={{ marginTop: 20 }}
+        pagination={{ pageSize: 5 }}
       />
     </div>
   );
